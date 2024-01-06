@@ -1,0 +1,83 @@
+import pygame
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+WIDTH, HEIGHT = 800, 600
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Space Invaders")
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+FPS = 60
+
+# Player class
+class Player:
+    def __init__(self):
+        self.x = WIDTH // 2
+        self.y = HEIGHT - 60
+        self.width = 40
+        self.height = 60
+        self.vel = 5
+
+    def draw(self, win):
+        pygame.draw.rect(win, WHITE, (self.x, self.y, self.width, self.height))
+
+    def move(self, direction):
+        if direction == "left":
+            self.x -= self.vel
+        if direction == "right":
+            self.x += self.vel
+
+# Enemy class
+class Enemy:
+    def __init__(self):
+        self.x = random.randint(0, WIDTH - 40)
+        self.y = random.randint(0, HEIGHT // 2)
+        self.width = 40
+        self.height = 40
+        self.vel = 1
+
+    def draw(self, win):
+        pygame.draw.rect(win, RED, (self.x, self.y, self.width, self.height))
+
+    def move(self):
+        self.y += self.vel
+
+# Main loop
+def main():
+    run = True
+    clock = pygame.time.Clock()
+    player = Player()
+    enemies = [Enemy() for _ in range(5)]
+
+    while run:
+        clock.tick(FPS)
+        WIN.fill((0, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and player.x - player.vel > 0:
+            player.move("left")
+        if keys[pygame.K_RIGHT] and player.x + player.width + player.vel < WIDTH:
+            player.move("right")
+
+        for enemy in enemies:
+            enemy.move()
+            enemy.draw(WIN)
+            if enemy.y > HEIGHT:
+                enemies.remove(enemy)
+                enemies.append(Enemy())
+
+        player.draw(WIN)
+        pygame.display.update()
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
+    
